@@ -369,7 +369,7 @@ function renderReports(){
   const repeats = repeatRecruiters();
 
   return `
-  <div class="callout"><b>Live query, not a snapshot</b>Repeat-recruiter detection counts distinct <b>PlacementDrive</b> rows per <b>Company</b> (equivalent to <span class="mono" style="color:var(--mulberry-deep);">GROUP BY company_id HAVING COUNT(*) &gt; 1</span>). Any company with more than one drive appears here automatically.</div>
+  <div class="callout"><b class="callout-title">Live query, not a snapshot</b>Repeat-recruiter detection counts distinct <b>PlacementDrive</b> rows per <b>Company</b> (equivalent to <span class="mono" style="color:var(--mulberry-deep);">GROUP BY company_id HAVING COUNT(*) &gt; 1</span>). Any company with more than one drive appears here automatically.</div>
 
   <div class="grid grid-3">
     <div class="report-block">

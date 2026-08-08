@@ -20,11 +20,28 @@
   --wait: #6B6FA8;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
 body {
+  margin: 0;
+  min-height: 100%;
   font-family: 'Nunito Sans', 'Canva Sans', sans-serif;
   background: var(--paper-warm);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
 .display { font-family: 'Poppins', 'Canva Sans', sans-serif; }
