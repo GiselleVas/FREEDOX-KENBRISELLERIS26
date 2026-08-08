@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>V05 — Employer & Placement Drive Records</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="shell">
+  <div class="rail">
+    <div class="rail-brand">
+      <div class="mark">Placement Cell</div>
+      <div class="sub">V05 · Employer Records</div>
+    </div>
+    <div class="rail-nav" id="railNav">
+      <button class="rail-btn" data-view="companies"><span class="ico">◆</span> Companies</button>
+      <button class="rail-btn" data-view="drives"><span class="ico">▤</span> Placement Drives</button>
+      <button class="rail-btn" data-view="reports"><span class="ico">◈</span> Reports</button>
+    </div>
+    <div class="rail-foot">Institution → Department → Program<br>V05 module: Company &amp; PlacementDrive</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="crumbs" id="crumbs"></div>
+        <h1 class="page-title" id="pageTitle">Companies</h1>
+        <div class="page-desc" id="pageDesc"></div>
+      </div>
+      <div id="topbarActions"></div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
