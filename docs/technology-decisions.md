@@ -1,54 +1,17 @@
-# UI / UX and Flow Diagram
+# Technology Decisions
 
-## Overview
-This app is designed to record employer and placement drive information in a clean, easy way. The main interface is a dashboard that keeps company data and placement drive data connected so the same employer record can be reused across multiple drives.
+## Project Overview
+This app is designed to record employer and placement-drive information in a clean, easy way. The main interface is a dashboard that keeps company data and placement-drive data connected so the same employer record can be reused across multiple drives.
 
-## Main UI structure
-
-1. Left navigation rail
-   - Shows the brand name and system title.
-   - Provides a simple visual anchor for the dashboard.
-   - On smaller screens it collapses into a full-width top section.
-
-2. Main dashboard area
-   - Displays the current view title and description.
-   - Includes a top action area for adding companies or switching tasks.
-   - Shows the main content for the current view.
-
-## Current views
-
-### Companies view
-- This is the default view in the dashboard.
-- It displays a master list of employer records.
-- Each company is meant to be stored once and reused for every placement drive.
-- If no companies exist, the screen shows a clear empty state and prompt to add the first employer.
-- The page title, description, and action button adjust based on the view.
-
-### Placement Drives view
-- The app is structured to support a placement drives view.
-- Placement drives are tied to companies, so each drive references a single employer record.
-- The current code foundation is ready for this view, even though the detailed drive cards are not fully built yet.
-
-## Supportive features
-
-- Filter options are prepared for industry, academic year, status, and search text.
-- Status options include upcoming, ongoing, completed, and cancelled.
-- A `fetchData` hook is ready to load employer records from Supabase.
-- The UI keeps the dashboard layout simple and easy to scan.
-
-## User flow
-
+## UI Flow
 1. User opens the app and sees the dashboard shell.
-2. User views the company directory first.
+2. User views the Companies section first.
 3. User can add a new company record.
-4. User selects a company to view its profile and related placement drives.
-5. User can switch to placement drives to see all drive entries.
-6. User can filter by year, industry, status, or search text.
-7. User can explore drive details and drive performance reports.
+4. User can reuse an existing company for placement-drive records.
+5. The app is structured so future views can show drive details and reporting insights.
 
-## Flow diagram
-
-```
+## Flow Diagram
+```text
 App opened
     |
     v
@@ -56,37 +19,38 @@ Dashboard shell
     |
     v
 Companies view
-    |   \----------------
-    |                    
-    v                    
-Company profile         
-    |                    
-    v                    
-Placement drives view   
-    |                    
-    v                    
-Drive detail / reports  
+    |
+    v
+Company record reused for placement drive
+    |
+    v
+Drive details / reporting view
 ```
 
-## Mobile-friendly behavior
+## 1. Frontend Framework
+- Requirement: build a fast, responsive dashboard for companies and placement drives.
+- Options: plain HTML/CSS, React with Astro, or a full SPA framework.
+- Evaluation: plain HTML would be fast but harder to extend; a full SPA adds more setup than needed for this MVP.
+- Decision: use Astro with React islands.
+- Evidence: the app now has a clear dashboard shell, reusable UI sections, and interactive company actions without overcomplicating the architecture.
 
-This app is now improved for mobile devices.
-- The dashboard shifts to a vertical layout on small screens.
-- The left navigation becomes a top section at full width.
-- Padding and spacing shrink gracefully on phones.
-- Action buttons expand to full width when needed so they remain easy to tap.
-- Company cards and grid layouts stack to fit narrow screens.
+## 2. Database and Data Storage
+- Requirement: store relational data for companies, academic years, and placement drives with simple integrity rules.
+- Options: local JSON, SQLite, or PostgreSQL.
+- Evaluation: JSON is easy but weak for relational integrity; SQLite is lightweight but less ideal for cloud-based collaboration.
+- Decision: use Supabase with PostgreSQL.
+- Evidence: the app successfully connects to Supabase and performs company reads and inserts through the existing data layer.
 
-## Why this works
+## 3. Styling Approach
+- Requirement: create a clean, modern dashboard quickly without much custom CSS overhead.
+- Options: plain CSS, Tailwind, or a component library.
+- Evaluation: plain CSS is flexible but slower to write; Tailwind gives rapid UI building with consistent styling.
+- Decision: use Tailwind CSS.
+- Evidence: the current interface uses a polished dashboard layout with minimal custom CSS and consistent spacing.
 
-- The interface keeps the structure simple and readable.
-- The user can focus on the current screen without extra clutter.
-- Mobile-friendly spacing and wrapping make the UI usable on phones.
-- The flow matches the project goal of capturing company and drive records without duplication.
-
-## Notes for future UX
-
-- Add a real navigation menu for companies, drives, and reports.
-- Add a company profile detail screen with drive history.
-- Add filters, search, and sorting controls in the dashboard.
-- Add clear error and success feedback for actions like add, edit, and delete.
+## 4. AI Tool Usage
+- Requirement: accelerate development while keeping the project grounded in working code.
+- Options: manual coding only or AI-assisted development.
+- Evaluation: manual coding is slower for a hackathon timeline; AI assistance helps with scaffolding, debugging, and documentation.
+- Decision: use AI-assisted development tools for scaffolding and refinement, while validating all changes through local testing.
+- Evidence: the app was iterated through working local runs and verified Supabase connectivity rather than relying on assumptions.
