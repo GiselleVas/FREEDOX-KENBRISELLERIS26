@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Nunito+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --mulberry: #8C1D3F;
+  --mulberry-deep: #5E1129;
+  --mulberry-soft: #C24E6E;
+  --mulberry-tint: #F7E6EB;
+  --ink: #241318;
+  --ink-soft: #6E5560;
+  --paper: #FFFFFF;
+  --paper-warm: #FBF7F8;
+  --line: #EAD9DE;
+  --ok: #2F7A4F;
+  --warn: #B5791A;
+  --stop: #A33333;
+  --wait: #6B6FA8;
+}
+
+body {
+  font-family: 'Nunito Sans', 'Canva Sans', sans-serif;
+  background: var(--paper-warm);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.display { font-family: 'Poppins', 'Canva Sans', sans-serif; }
+::selection { background: var(--mulberry-tint); color: var(--mulberry-deep); }

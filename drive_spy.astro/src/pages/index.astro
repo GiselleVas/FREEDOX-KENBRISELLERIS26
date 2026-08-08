@@ -1,0 +1,31 @@
+---
+import '../styles/global.css';
+import Dashboard from '../components/react/Dashboard'
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V05 — Employer & Placement Drive Records</title>
+</head>
+<body>
+  <div class="shell flex min-h-screen">
+    <!-- Left Navigation Rail -->
+    <div class="rail w-[230px] shrink-0 bg-[#5E1129] text-[#F4E3E9] flex flex-col py-7 sticky top-0 h-screen">
+      <div class="rail-brand px-6 pb-6 border-b border-white/10 mb-4">
+        <div class="mark font-['Poppins'] font-bold text-[19px] text-white">Placement Cell</div>
+        <div class="sub text-[11px] uppercase tracking-[1.4px] text-[#D79CAE] mt-1">V05 · Employer Records</div> </div>
+      
+      <!-- React will portal or control navigation state from within, or we wrap the whole shell in React. -->
+      <!-- For this MVP, the Dashboard component will take over the main layout. -->
+    </div>
+
+    <!-- Main Content Area populated by React Island -->
+    <main class="main flex-1 min-w-0">
+      <Dashboard client:load />
+    </main>
+  </div>
+</body>
+</html>
