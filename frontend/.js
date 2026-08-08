@@ -15,6 +15,32 @@ let state = { view:"companies", companyId:null, driveId:null,
   filters:{ industry:"All", year:"All", status:"All", q:"" },
   modal:null, editDriveId:null };
 
+async function api(url, options={}){
+  const response = await fetch(url, {
+    headers: { "Content-Type": "application/json" },
+    ...options,
+    body: options.body ? JSON.stringify(options.body) : undefined
+  });
+  if(!response.ok) throw new Error("The database request could not be completed.");
+  return response.status === 204 ? null : response.json();
+}
+
+async function loadData(){
+  try {
+    const data = await api("/api/data");
+    companies = data.companies;
+    placementDrives = data.placementDrives;
+    academicYears = data.academicYears;
+    nextCompanyId = Math.max(0, ...companies.map(c=>c.id)) + 1;
+    nextDriveId = Math.max(0, ...placementDrives.map(d=>d.id)) + 1;
+    nextYearId = Math.max(0, ...academicYears.map(y=>y.id)) + 1;
+    render();
+  } catch(error) {
+    render();
+    toast("Could not load the database. Check that the local server is running.");
+  }
+}
+
 /* ---------- helpers ---------- */
 const companyById = id => companies.find(c => c.id === id);
 const yearById = id => academicYears.find(y => y.id === id);
@@ -415,7 +441,7 @@ function openCompanyModal(){
   document.getElementById("mClose").onclick = close;
   document.getElementById("mCancel").onclick = close;
   document.getElementById("backdrop").addEventListener("click", e=>{ if(e.target.id==="backdrop") close(); });
-  document.getElementById("mSave").onclick = ()=>{
+  document.getElementById("mSave").onclick = async ()=>{
     const name = document.getElementById("iName").value.trim();
     const industry = document.getElementById("iIndustry").value.trim();
     const location = document.getElementById("iLocation").value.trim();
@@ -429,11 +455,13 @@ function openCompanyModal(){
     if(!industry){ markErr("fIndustry","Industry is required."); ok=false; }
     if(!ok) return;
 
-    const c = { id: nextCompanyId++, name, industry, location, created_at: new Date().toISOString() };
-    companies.push(c);
-    close();
-    toast(`Company "${name}" added.`);
-    nav("companyProfile", {companyId: c.id});
+    try {
+      const c = await api("/api/companies", { method:"POST", body:{ name, industry, location } });
+      companies.push(c);
+      close();
+      toast(`Company "${name}" added.`);
+      nav("companyProfile", {companyId: c.id});
+    } catch(error) { markErr("fName", "Could not save the company. Please try again."); }
   };
 }
 function markErr(fieldId, msg){
@@ -500,14 +528,16 @@ function openDriveModal(driveId=null, presetCompanyId=null){
   document.getElementById("mCancel").onclick = close;
   document.getElementById("backdrop").addEventListener("click", e=>{ if(e.target.id==="backdrop") close(); });
 
-  document.getElementById("iYear").addEventListener("change", e=>{
+  document.getElementById("iYear").addEventListener("change", async e=>{
     if(e.target.value === "__new__"){
       const label = prompt("New academic year label (e.g. 2026-2027):");
       if(label && label.trim()){
-        const y = { id: nextYearId++, year_label: label.trim() };
-        academicYears.push(y);
-        openDriveModal(driveId, presetCompanyId ?? (editing?editing.company_id:null));
-        setTimeout(()=>{ const sel = document.getElementById("iYear"); if(sel) sel.value = y.id; }, 0);
+        try {
+          const y = await api("/api/academic-years", { method:"POST", body:{ year_label: label.trim() } });
+          academicYears.push(y);
+          openDriveModal(driveId, presetCompanyId ?? (editing?editing.company_id:null));
+          setTimeout(()=>{ const sel = document.getElementById("iYear"); if(sel) sel.value = y.id; }, 0);
+        } catch(error) { alert("Could not save the academic year. Please try again."); }
       } else {
         e.target.value = editing ? editing.academic_year_id : "";
       }
@@ -515,16 +545,19 @@ function openDriveModal(driveId=null, presetCompanyId=null){
   });
 
   if(editing){
-    document.getElementById("mDelete").onclick = ()=>{
+    document.getElementById("mDelete").onclick = async ()=>{
       if(confirm("Delete this drive record? This cannot be undone.")){
-        placementDrives = placementDrives.filter(d=>d.id!==editing.id);
-        close(); toast("Drive deleted.");
-        nav("drives");
+        try {
+          await api(`/api/drives/${editing.id}`, { method:"DELETE" });
+          placementDrives = placementDrives.filter(d=>d.id!==editing.id);
+          close(); toast("Drive deleted.");
+          nav("drives");
+        } catch(error) { alert("Could not delete the drive. Please try again."); }
       }
     };
   }
 
-  document.getElementById("mSave").onclick = ()=>{
+  document.getElementById("mSave").onclick = async ()=>{
     document.querySelectorAll(".field-err").forEach(e=>e.remove());
     document.querySelectorAll(".field").forEach(f=>f.classList.remove("has-err"));
     let ok = true;
@@ -539,22 +572,22 @@ function openDriveModal(driveId=null, presetCompanyId=null){
     if(!STATUS_OPTIONS.includes(statusVal)){ ok=false; }
     if(!ok) return;
 
-    if(editing){
-      editing.academic_year_id = yearVal;
-      editing.eligibility_criteria = elig;
-      editing.drive_date = dateVal;
-      editing.drive_status = statusVal;
-      close(); toast("Drive updated.");
-      nav("driveDetail", {driveId: editing.id});
-    } else {
-      const d = { id: nextDriveId++, company_id: companyIdVal, academic_year_id: yearVal,
-        eligibility_criteria: elig, drive_date: dateVal, drive_status: statusVal, created_at: new Date().toISOString() };
-      placementDrives.push(d);
-      close(); toast("Placement drive added.");
-      nav("driveDetail", {driveId: d.id});
-    }
+    const payload = { company_id: companyIdVal, academic_year_id: yearVal, eligibility_criteria: elig, drive_date: dateVal, drive_status: statusVal };
+    try {
+      if(editing){
+        const updated = await api(`/api/drives/${editing.id}`, { method:"PATCH", body:payload });
+        placementDrives = placementDrives.map(d=>d.id===updated.id ? updated : d);
+        close(); toast("Drive updated.");
+        nav("driveDetail", {driveId: updated.id});
+      } else {
+        const d = await api("/api/drives", { method:"POST", body:payload });
+        placementDrives.push(d);
+        close(); toast("Placement drive added.");
+        nav("driveDetail", {driveId: d.id});
+      }
+    } catch(error) { markErr(editing ? "fYear" : "fCompany", "Could not save the drive. Please try again."); }
   };
 }
 
 /* init */
-render();
+loadData();
